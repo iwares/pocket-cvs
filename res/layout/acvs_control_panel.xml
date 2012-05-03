@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical|center_horizontal"
+    android:orientation="vertical"
+    android:padding="16dp" >
+
+    <ImageView
+        android:id="@+id/StatusImage"
+        android:layout_width="128dp"
+        android:layout_height="144dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_margin="8dp"
+        android:background="@drawable/service_is_initializing"
+        android:contentDescription="@string/status" >
+    </ImageView>
+
+    <TextView
+        android:id="@+id/StatusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="8dp"
+        android:text="@string/status_initializing"
+        android:textSize="24dp" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/DescriptionText"
+        android:layout_width="wrap_content"
+        android:layout_height="64dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="8dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/description_initializing"
+        android:textSize="16dp" >
+    </TextView>
+
+    <Button
+        android:id="@+id/StartStopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="8dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:text="@string/button_start"
+        android:textSize="18dp"
+        android:visibility="gone" >
+    </Button>
+
+    <ProgressBar
+        android:id="@+id/ProgressRing"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="8dp" >
+    </ProgressBar>
+
+</LinearLayout>
