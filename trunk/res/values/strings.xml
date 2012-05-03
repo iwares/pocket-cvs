@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="application_name">Pocket CVS</string>
+    <string name="button_start">Start CVS Service</string>
+    <string name="button_stop">Stop CVS Service</string>
+    <string name="status">Cvs Service Status</string>
+    <string name="status_initializing">Initializing</string>
+    <string name="description_initializing">CVS control panel is initializing.\nPlease wait.</string>
+    <string name="status_stopped">Stopped</string>
+    <string name="description_stopped">CVS daemon service is stopped.\nPlease click \"Start CVS Service\" button to start it.</string>
+    <string name="status_running">Running</string>
+    <string name="description_running">CVS daemon service is running and the root directory is shown as below.\n</string>
+    <string name="menu_password">Password</string>
+    <string name="menu_quit">Quit</string>
+    <string name="menu_start">Start</string>
+    <string name="menu_stop">Stop</string>
+    <string name="text_username">User Name:</string>
+    <string name="text_password">Password:</string>
+    <string name="password_dialog_title">Change User Password</string>
+    <string name="button_confirm">Confirm</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="password_changed">User name Password is changed!</string>
+    <string name="password_not_changed">Failed to change User name Password!</string>
+    <string name="no_network_available">&lt;NO AVAILABLE NETWORK></string>
+    <string name="perm_cvs_service_label">Enable or disable CVS service</string>
+    <string name="perm_cvs_service_desc">Allows the application to enable or disable the CVS service provided by iWARES Pocket CVS application.</string>
+
+</resources>
