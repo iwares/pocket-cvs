@@ -1,0 +1,40 @@
+What is it
+========================================
+Pocket CVS is a tiny CVS server that can run on you Android devices. With this
+application, you can take you projects in your pocket and access them anywhere.
+
+How to use
+========================================
+1. Install com.iwares.app.pocketcvs.xxx.apk to you Android device.
+2. Launch the application.
+3. Click "Start CVS Service" button to start CVS service.
+4. If you Android device is connected to a network, the root directory of the
+   CVS repository will displayed on the screen.
+5. Then, you can access the CVS repository with user name "User" and password
+   "Ab-123456"
+6. You can change user name and password with "Password" command in the context
+   menu.
+7. Click "Stop CVS Service" button if you want to stop the CVS service.
+
+Dependence
+========================================
+Pocket CVS is based on CVS and Glibc open source project.
+The recommand pair are CVS-1.11.23 and Glibc-2.14. You can use other packages
+but they are not valified and may not work correctly.
+
+How to build
+========================================
+1. Download CVS source tar ball and extract to jni/cvs-src
+2. Download Glibc source tar ball and extract to jni/glibc-src
+3. Make sure your NDK is in you PATH evn variable.
+4. Run build.sh under jni directory to build the JNI libraries.
+5. Import project into Eclipse IDE.
+6. Export signed apk file with Eclipse IDE.
+
+License
+========================================
+Pocket CVS is an open source porject under Apache License 2.0.
+CVS and Glibc are not parts of this open source porject, but Pocket CVS can not
+work without these two project. CVS and Glibc a both under GPL license, so if
+you want to use Pocket CVS project to do something, don't foget to follow CVS
+and Glibc's GPL license.
