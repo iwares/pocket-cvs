@@ -36,10 +36,14 @@ extern "C" {
  *
  * @param	env		The Java environment object pointer.
  * @param	thiz	The CVSService Java object.
+ * @param	rstr	Repository path Java string object.
+ * @param	tstr	Temporary path Java string object
  *
  */
-JNIEXPORT void Java_com_iwares_app_pocketcvs_CVSService_nativeOnCreate(
-	JNIEnv* env, jobject thiz
+JNIEXPORT jboolean Java_com_iwares_app_pocketcvs_CVSService_nativeOnCreate(
+	JNIEnv* env, jobject thiz,
+	jstring rstr,
+	jstring tstr
 	);
 
 /**

@@ -84,8 +84,8 @@ public class ControlPanelActivity extends Activity implements CVSAgent.Callback,
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		startService(CVSService.INTENT);
-		bindService(CVSService.INTENT, mCVSAgent = new CVSAgent(this), 0);
+		CVSService.startService(this, false);
+		CVSService.bindService(this, mCVSAgent = new CVSAgent(this), 0);
 		mIPAddressMonitor = new IPAddressMonitor(this, this);
 		setContentView(R.layout.acvs_control_panel);
 		mStatusImage = (ImageView)findViewById(R.id.StatusImage);
@@ -121,7 +121,7 @@ public class ControlPanelActivity extends Activity implements CVSAgent.Callback,
 	public void onDestroy() {
 		unbindService(mCVSAgent);
 		if (!mIsDaemonRunning)
-			stopService(CVSService.INTENT);
+			CVSService.stopService(this);
 		super.onDestroy();
 	}
 
@@ -150,7 +150,7 @@ public class ControlPanelActivity extends Activity implements CVSAgent.Callback,
 			if (mIPAddress == null)
 				description += getString(R.string.no_network_available);
 			else
-				description += mIPAddress + ":" + "/sdcard/.cvsrepo";
+				description += mIPAddress + ":" + CVSService.REPOSITORY_PATH;
 			mStatusImage.setBackgroundResource(R.drawable.service_is_running);
 			mStatusText.setText(R.string.status_running);
 			mDescriptionText.setText(description);
