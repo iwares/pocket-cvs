@@ -23,9 +23,16 @@
 
 package com.iwares.app.pocketcvs;
 
+import java.lang.ref.WeakReference;
+
 import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -40,8 +47,70 @@ import android.util.Log;
  */
 public class CVSService extends Service {
 
-	/** Intent object used to start, stop, bind and unbind CVSService. */
-	public static final Intent INTENT = new Intent("com.iwares.intent.action.CVS_DAEMON_SERVICE");
+	/** Repository path of CVS service. */
+	public static final String REPOSITORY_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/.cvsrepo";
+
+	/** Temporary path of CVS service. */
+	public static final String TEMPORARY_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/.cvstemp";
+
+	/** Intent action of the CVSService. */
+	private static final String ACTION_CVS_DAEMON = "com.iwares.intent.action.CVS_DAEMON_SERVICE";
+
+	/** Key of start up extra of CVSService intent. */
+	private static final String KEY_RESTORE = "com.iwares.app.pocketcvs.RESOTRE";
+
+	/** Name of the preferences file name. */
+	private static final String SHARED_PREFENCES_NAME = "cvsdaemon.prefs";
+
+	/** Key used to access daemon status (boolean) in cvsdaemon.prefs */
+	private static final String KEY_DAEMON_STATUS = "Daemon Status";
+
+	/**
+	 * Start CVSService.
+	 *
+	 * @param context	Context.
+	 * @param restore	If restore is true, The CVSService will stop if the saved
+	 *					CVS daemon status is stopped.
+	 * @return			If the service is being started or is already running, the
+	 *					ComponentName of the actual service that was started is
+	 *					returned; else if the service does not exist null is
+	 *					returned.
+	 */
+	public static final ComponentName startService(Context context, boolean restore) {
+		Intent intent = new Intent(ACTION_CVS_DAEMON)
+			.putExtra(KEY_RESTORE, restore)
+			;
+		return context.startService(intent);
+	}
+
+	/**
+	 * Stop CVSService.
+	 *
+	 * @param context	Context.
+	 * @return			If there is a service matching the given Intent that is
+	 *					already running, then it is stopped and true is returned;
+	 *					else false is returned.
+	 */
+	public static final boolean stopService(Context context) {
+		Intent intent = new Intent(ACTION_CVS_DAEMON);
+		return context.stopService(intent);
+	}
+
+	/**
+	 * Bind CVSService.
+	 *
+	 * @param context	Context
+	 * @param conn		Receives information as the service is started and stopped.
+	 * @param flags		BIND_NOT_FOREGROUND, BIND_ABOVE_CLIENT,
+	 *					BIND_ALLOW_OOM_MANAGEMENT, or BIND_WAIVE_PRIORITY.
+	 * @return			If you have successfully bound to the service, true is
+	 *					returned; false is returned if the connection is not made
+	 *					so you will not receive the service object.
+	 */
+	public static final boolean bindService(Context context, ServiceConnection conn, int flags) {
+		Intent intent = new Intent(ACTION_CVS_DAEMON);
+		return context.bindService(intent, conn, flags);
+	}
 
 	/**
 	 * Message handler used to handle request from CVSAgent.
@@ -49,17 +118,26 @@ public class CVSService extends Service {
 	 * @author Eric.Tsai
 	 *
 	 */
-	private class RequestHandler extends Handler {
+	private static class RequestHandler extends Handler {
+
+		private final WeakReference<CVSService> mCVSServiceRef;
+
+		public RequestHandler(CVSService cvsService) {
+			mCVSServiceRef = new WeakReference<CVSService>(cvsService);
+		}
+
 		@Override
 		public void handleMessage(Message msg) {
-			if (CVSService.this.onRequestMessage(msg))
+			CVSService cvsService = mCVSServiceRef.get();
+			if (cvsService != null && cvsService.onRequestMessage(msg))
 				return;
 			super.handleMessage(msg);
 		}
+
 	}
 
 	/** Messenger used to communicate with CVSAgent. */
-	private final Messenger mServiceMessenger = new Messenger(new RequestHandler());
+	private final Messenger mServiceMessenger = new Messenger(new RequestHandler(this));
 
 	/* (non-Javadoc)
 	 * @see android.app.Service#onBind(android.content.Intent)
@@ -69,13 +147,23 @@ public class CVSService extends Service {
 		return mServiceMessenger.getBinder();
 	}
 
+	/** Shared preferences */
+	private SharedPreferences mPreferences = null;
+
 	/* (non-Javadoc)
 	 * @see android.app.Service#onStartCommand(android.content.Intent, int, int)
 	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		if (intent == null)
+		if (mPreferences.getBoolean(KEY_DAEMON_STATUS, false)) {
+			Log.i("CVSService", "Saved CVS daemon status is 'started', start CVS daemon.");
 			startDaemon();
+		} else if (intent.getBooleanExtra(KEY_RESTORE, true)) {
+			Log.i("CVSService", "Saved CVS daemon status is 'stopped', stop CVSService.");
+			stopSelf();
+		} else {
+			Log.i("CVSService", "CVSService is ready for serve.");
+		}
 		return START_STICKY;
 	}
 
@@ -85,7 +173,8 @@ public class CVSService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		nativeOnCreate();
+		mPreferences = getSharedPreferences(SHARED_PREFENCES_NAME, MODE_PRIVATE);
+		nativeOnCreate(REPOSITORY_PATH, TEMPORARY_PATH);
 	}
 
 	/* (non-Javadoc)
@@ -94,6 +183,7 @@ public class CVSService extends Service {
 	@Override
 	public void onDestroy() {
 		nativeOnDestroy();
+		mPreferences = null;
 		super.onDestroy();
 	}
 
@@ -137,30 +227,41 @@ public class CVSService extends Service {
 	 */
 	protected boolean onRequestMessage(Message msg) {
 		Log.d("CVSService", msg.toString());
-		int result = 0;
+		boolean result = false;
 		switch (msg.what) {
 		case MSG_DAEMON_STATUS:
-			result = isDaemonRunning() ? 1 : 0;
-			replyMessage(msg.replyTo, msg.what, result);
+			result = isDaemonRunning();
+			saveDaemonStatus(result);
+			replyMessage(msg.replyTo, msg.what, result ? 1 : 0);
 			return true;
 		case MSG_START_DAEMON:
-			result = startDaemon() ? 1 : 0;
-			replyMessage(msg.replyTo, msg.what, result);
+			result = startDaemon();
+			saveDaemonStatus(isDaemonRunning());
+			replyMessage(msg.replyTo, msg.what, result ? 1 : 0);
 			return true;
 		case MSG_STOP_DAEMON:
-			result = stopDaemon() ? 1 : 0;
-			replyMessage(msg.replyTo, msg.what, result);
+			result = stopDaemon();
+			saveDaemonStatus(isDaemonRunning());
+			replyMessage(msg.replyTo, msg.what, result ? 1 : 0);
 			return true;
 		case MSG_SET_USER_PASSWORD:
 			result = setUserPassword(
 				((Bundle)msg.obj).getString("username"),
 				((Bundle)msg.obj).getString("password")
-				) ? 1 : 0;
-			replyMessage(msg.replyTo, msg.what, result);
+				);
+			replyMessage(msg.replyTo, msg.what, result ? 1 : 0);
 			return true;
 		default:
 			return false;
 		}
+	}
+
+	/** Save current CVS daemon status to shared preferences. */
+	protected void saveDaemonStatus(boolean isRunning) {
+		boolean status = mPreferences.getBoolean(KEY_DAEMON_STATUS, false);
+		if (status == isRunning)
+			return;
+		mPreferences.edit().putBoolean(KEY_DAEMON_STATUS, isRunning).commit();
 	}
 
 	/** Load libcvsdsrv.so for CVSDaemonService.*/
@@ -173,7 +274,7 @@ public class CVSService extends Service {
 	 * Initial native CVSService object.
 	 *
 	 */
-	private native void nativeOnCreate();
+	private native boolean nativeOnCreate(String repoPath, String tempPath);
 
 	/**
 	 * Native method to change user name and password.

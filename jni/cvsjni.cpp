@@ -36,10 +36,6 @@
 
 #include <stdlib.h>
 
-/** CVS repository path. */
-static const char *CVS_REPO_PATH = "/sdcard/.cvsrepo";
-/** CVS temporary path. */
-static const char *CVS_TEMP_PATH = "/sdcard/.cvstemp";
 /** CVS executable path. */
 static const char *CVS_EXEC_PATH = "/data/data/com.iwares.app.pocketcvs/lib/libcvsexec.so";
 
@@ -107,14 +103,26 @@ static inline jfieldID __Java_internal_GetFieldID(
  * CVSService object.
  *
  */
-void Java_com_iwares_app_pocketcvs_CVSService_nativeOnCreate(
-	JNIEnv* env, jobject thiz
+jboolean Java_com_iwares_app_pocketcvs_CVSService_nativeOnCreate(
+	JNIEnv* env, jobject thiz,
+	jstring rstr,
+	jstring tstr
 	)
 {
-	CVSService *service = new CVSService(CVS_REPO_PATH, CVS_TEMP_PATH, CVS_EXEC_PATH);
+	char repoPath[128], tempPath[128];
+	if (__Java_internal_ASCIIJStringToCString(repoPath, 128, env, rstr)[0] == 0) {
+		LOG_W("nativeOnCreate return JNI_FALSE: Cannot convert repo path Java String to C string.");
+		return JNI_FALSE;
+	}
+	if (__Java_internal_ASCIIJStringToCString(tempPath, 128, env, tstr)[0] == 0) {
+		LOG_W("nativeOnCreate return JNI_FALSE: Cannot convert temp path Java String to C string.");
+		return JNI_FALSE;
+	}
+	CVSService *service = new CVSService(repoPath, tempPath, CVS_EXEC_PATH);
 	LOG_I("Created native CVSService object 0x%08x", service);
 	jfieldID field = __Java_internal_GetFieldID(env, thiz, "mNativePtr", "I");
 	env->SetIntField(thiz, field, (int)service);
+	return JNI_TRUE;
 }
 
 /**
@@ -160,6 +168,10 @@ jboolean Java_com_iwares_app_pocketcvs_CVSService_startDaemon(
 {
 	jfieldID field = __Java_internal_GetFieldID(env, thiz, "mNativePtr", "I");
 	CVSService *service = (CVSService*)env->GetIntField(thiz, field);
+	if (NULL == service) {
+		LOG_W("startDaemon return JNI_FALSE: Native CVSService object is NULL.");
+		return JNI_FALSE;
+	}
 	if (!service->startDaemon()) {
 		LOG_W("startDaemon return JNI_FALSE: CVSService::startDaemon return false.");
 		return JNI_FALSE;
@@ -179,6 +191,10 @@ jboolean Java_com_iwares_app_pocketcvs_CVSService_isDaemonRunning(
 {
 	jfieldID field = __Java_internal_GetFieldID(env, thiz, "mNativePtr", "I");
 	CVSService *service = (CVSService*)env->GetIntField(thiz, field);
+	if (NULL == service) {
+		LOG_W("isDaemonRunning return JNI_FALSE: Native CVSService object is NULL.");
+		return JNI_FALSE;
+	}
 	bool result = service->isDaemonRunning();
 	LOG_I("isDaemonRunning return %s", result ? "JNI_TRUE" : "JNI_FALSE");
 	return result ? JNI_TRUE : JNI_FALSE;
@@ -195,6 +211,10 @@ jboolean Java_com_iwares_app_pocketcvs_CVSService_stopDaemon(
 {
 	jfieldID field = __Java_internal_GetFieldID(env, thiz, "mNativePtr", "I");
 	CVSService *service = (CVSService*)env->GetIntField(thiz, field);
+	if (NULL == service) {
+		LOG_W("stopDaemon return JNI_FALSE: Native CVSService object is NULL.");
+		return JNI_FALSE;
+	}
 	if (!service->stopDaemon()) {
 		LOG_W("stopDaemon return JNI_FALSE: CVSService::startDaemon return false.");
 		return JNI_FALSE;

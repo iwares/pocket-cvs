@@ -48,6 +48,14 @@
                 </action>
             </intent-filter>
         </service>
+
+        <receiver android:name=".MediaReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_MOUNTED" />
+
+                <data android:scheme="file" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
