@@ -1,5 +1,3 @@
-#!/bin/sh
-
 #
 # Copyright (C) 2011 iWARES Solution Provider
 #
@@ -17,20 +15,8 @@
 #
 
 #
-# @file	jni/build.sh
+# @file	jni/Application.mk
 # @author	Eric.Tsai
 #
 
-BUILDPATH=$(dirname $0)
-cd $BUILDPATH
-if [ "$1" != "clean" ]; then
-	ndk-build
-	mv ../libs/armeabi/cvs ../libs/armeabi/libcvsexec.so
-	mv ../libs/x86/cvs ../libs/x86/libcvsexec.so
-	mv ../libs/mips/cvs ../libs/mips/libcvsexec.so
-else
-	rm -fr ../libs/armeabi/libcvsexec.so
-	rm -fr ../libs/x86/libcvsexec.so
-	rm -fr ../libs/mips/libcvsexec.so
-	ndk-build clean
-fi
+APP_ABI := armeabi x86 mips
