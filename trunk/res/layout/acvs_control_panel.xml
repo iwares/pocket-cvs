@@ -23,7 +23,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_margin="8dp"
         android:text="@string/status_initializing"
-        android:textSize="24dp" >
+        android:textSize="24sp" >
     </TextView>
 
     <TextView
@@ -34,26 +34,26 @@
         android:layout_margin="8dp"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/description_initializing"
-        android:textSize="16dp" >
+        android:textSize="16sp" >
     </TextView>
 
     <Button
         android:id="@+id/StartStopButton"
         android:layout_width="wrap_content"
-        android:layout_height="56dp"
+        android:layout_height="48dp"
         android:layout_gravity="center_horizontal"
         android:layout_margin="8dp"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:text="@string/button_start"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:visibility="gone" >
     </Button>
 
     <ProgressBar
         android:id="@+id/ProgressRing"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_gravity="center_horizontal"
         android:layout_margin="8dp" >
     </ProgressBar>
