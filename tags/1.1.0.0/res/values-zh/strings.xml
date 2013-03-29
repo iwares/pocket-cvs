@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="application_name">Pocket CVS</string>
+    <string name="button_start">启用 CVS 服务</string>
+    <string name="button_stop">停用 CVS 服务</string>
+    <string name="status">CVS 服务状态</string>
+    <string name="status_initializing">正在初始化</string>
+    <string name="description_initializing">CVS 控制面板正在初始化.\n请稍候.</string>
+    <string name="status_stopped">已停用 CVS 服务</string>
+    <string name="description_stopped">CVS 服务已被停用.\n请点按 \"启用 CVS 服务\" 按钮以启用该服务.</string>
+    <string name="status_running">已启用 CVS 服务</string>
+    <string name="description_running">CVS 服务正在运行中.\nCVS 根目录已显示在屏幕下方.\n</string>
+    <string name="menu_password">密码</string>
+    <string name="menu_quit">退出</string>
+    <string name="menu_start">启用</string>
+    <string name="menu_stop">停用</string>
+    <string name="text_username">用户:</string>
+    <string name="text_password">密码:</string>
+    <string name="password_dialog_title">更改用户名与密码</string>
+    <string name="button_confirm">确认</string>
+    <string name="button_cancel">取消</string>
+    <string name="password_changed">用户名与密码已更改!</string>
+    <string name="password_not_changed">无法更改用户名与密码!</string>
+    <string name="no_network_available">&lt;尚未连接到网络中></string>
+    <string name="perm_cvs_service_label">启用或停用 CVS 服务</string>
+    <string name="perm_cvs_service_desc">允许应用程序启用或停用由 iWARES Pocket CVS 应用程序提供的 CVS 服务。</string>
+
+</resources>

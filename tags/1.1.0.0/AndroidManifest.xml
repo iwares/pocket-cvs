@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.iwares.app.pocketcvs"
+    android:versionCode="2"
+    android:versionName="1.1.0.0" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="17" />
+
+    <permission
+        android:name="iwares.permission.POCKET_CVS_SERVICE"
+        android:description="@string/perm_cvs_service_desc"
+        android:label="@string/perm_cvs_service_label"
+        android:permissionGroup="android.permission-group.NETWORK"
+        android:protectionLevel="dangerous" >
+    </permission>
+
+    <uses-permission android:name="iwares.permission.POCKET_CVS_SERVICE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/application_icon"
+        android:label="@string/application_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".ControlPanelActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/application_name"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".CVSService"
+            android:permission="iwares.permission.POCKET_CVS_SERVICE"
+            android:process=":cvsdsrv" >
+            <intent-filter>
+                <action android:name="com.iwares.intent.action.CVS_DAEMON_SERVICE" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name=".MediaReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_MOUNTED" />
+
+                <data android:scheme="file" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>
